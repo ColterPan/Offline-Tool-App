@@ -8,4 +8,4 @@ EXE_NAME = "OfflineTools"  # executable and installer file name: no spaces
 BUNDLE_ID = "com.pantechautomation.offlinetools"  # macOS bundle identifier
 SOURCE_URL = "https://github.com/ColterPan/Offline-Tool-App"
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

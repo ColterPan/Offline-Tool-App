@@ -3,7 +3,7 @@
 Everyday file tools (PDF, images, data, QR codes) that run **entirely on your own computer**.
 No uploads, no accounts, no tracking. Your NRIC, payslips and certificates never leave your PC.
 
-> Status: **beta (v0.1.0)**. Five tools work today; see the [roadmap](docs/roadmap.md) for
+> Status: **beta (v0.2.0)**. Nine tools work today; see the [roadmap](docs/roadmap.md) for
 > what's next. The repository is private until the first public release.
 
 ## Why
@@ -28,12 +28,16 @@ Each release lists SHA-256 checksums. You can check your download with the app's
 
 | Category | Tool | Status |
 |---|---|---|
+| Privacy & safety | Redact Documents: black out parts of PDFs and photos (flattened, so it's really gone) | ✅ v0.2 |
+| Privacy & safety | Check a QR Code: photo, screenshot, webcam or link; flags scam signs and fake payment codes | ✅ v0.2 |
+| PDF | Scan Document: phone photo → straight, clean scan (PDF/JPG/PNG) | ✅ v0.2 |
+| Images | Watermark Photos: text or logo, any position, tiled, opacity, angle; ID-copy template | ✅ v0.2 |
 | PDF | Images → PDF (reorder pages, A4/Letter, margins) | ✅ v0.1 |
 | Images | Convert Images: JPG ↔ PNG ↔ WEBP, batch, strips location data | ✅ v0.1 |
 | Data | Excel ↔ CSV (keeps leading zeros, blocks formula injection) | ✅ v0.1 |
 | Everyday | QR Code Generator: link/text, Wi-Fi login, contact card | ✅ v0.1 |
 | Everyday | Check File Hash (SHA-256 / SHA-1 / MD5) | ✅ v0.0.1 |
-| PDF / Images | Compress PDF and images, merge/split PDF, HEIC → JPG, remove photo location | Planned v0.2 |
+| PDF / Images | Compress PDF and images, merge/split PDF, HEIC → JPG, remove photo location | Planned v0.3 |
 
 ## Run from source
 
@@ -82,7 +86,9 @@ builds both on every version tag.
 
 ## Privacy
 
-The app makes **no network connections**. There is no telemetry, analytics or auto-update check.
+The app makes **no network connections**. The QR checker works entirely offline (it looks
+for warning signs rather than querying online scam lists), and the webcam view never leaves
+your computer. There is no telemetry, analytics or auto-update check.
 Any future optional download (such as the AI model for background removal) will ask first.
 The code is open source so anyone can check this.
 

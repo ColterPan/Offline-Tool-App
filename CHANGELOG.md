@@ -2,7 +2,33 @@
 
 All notable changes are listed here. Versions follow [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] - unreleased
+## [0.2.0] - unreleased
+
+### Added
+
+- **Redact Documents** (new *Privacy & safety* section): draw boxes over anything in a PDF or
+  photo, page by page, in black or white. The saved copy is flattened to images, so hidden text
+  can't be copied out of it.
+- **Watermark Photos**: text or logo, nine positions or click anywhere on the live preview, or
+  tile across the photo; opacity, size, angle, colour and outline. Batch mode, plus an
+  "ID-copy template" ("COPY FOR ____ ONLY" + date). Metadata is not copied.
+- **Check a QR Code**: from a photo, a pasted screenshot (Ctrl+V), the webcam, or a pasted link.
+  Offline checks for fake bank and government sites, look-alike characters, hidden short
+  links, IP-address links and downloads of apps or programs (.apk, .exe). PayNow/SGQR payment
+  codes show who you'd pay and whether the code's checksum was tampered with.
+- **Scan Document**: finds the page in a phone photo, lets you adjust the corners (mouse or
+  keyboard), straightens it and removes shadows: black & white, greyscale or colour, saved as
+  PDF, JPG or PNG.
+- `--self-test`: exercises every bundled native library (PDFium, OpenCV, zxing, Qt's SVG
+  plugin). CI runs it on the installed Windows app and the macOS app.
+
+### Changed
+
+- Installer grows to about 57 MB (OpenCV for the scanner). Unused FFmpeg and software-OpenGL
+  DLLs are left out on Windows.
+- Checked radio buttons show a proper dot; new amber "warning" colour that meets WCAG contrast.
+
+## [0.1.0] - 2026-11-03
 
 ### Added
 

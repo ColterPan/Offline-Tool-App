@@ -6,10 +6,11 @@ Each phase ends with a release. Keep phases small: a finished v0.1 beats a half-
 |---|---|---|
 | **v0.0.1** ✅ | Foundation | App shell, theme, settings, logging, installer pipeline, Check File Hash |
 | **v0.1** ✅ | First real tools | QR code generator (link, Wi-Fi, vCard), Images → PDF, Convert Images (JPG/PNG/WEBP), Excel ↔ CSV |
-| v0.2 | Privacy-critical | Compress image (target KB), compress PDF, merge/split/reorder/rotate PDF, HEIC → JPG, remove photo location (EXIF) |
-| v0.3 | Public beta | Download section on pantechautomation.com, SmartScreen/Gatekeeper guide, feedback form, VirusTotal check |
-| v0.4 | Editing + office data | Resize/crop presets (SG passport 35×45 mm), watermark, sharpen, blur area, batch rename, merge Excel/CSV, remove duplicate rows, CSV ↔ JSON |
-| v0.5 | Heavier features | Background removal (opt-in model download), PDF → images, sign PDF, QR reader |
+| **v0.2** ✅ | Privacy & safety | Redact Documents, Check a QR Code (photo/screenshot/webcam/link, PayNow checks), Watermark Photos, Scan Document |
+| v0.3 | Shrink & split | Compress image (target KB), compress PDF, merge/split/reorder/rotate PDF, HEIC → JPG, remove photo location (EXIF) |
+| v0.4 | Public beta | Download section on pantechautomation.com, SmartScreen/Gatekeeper guide, feedback form, VirusTotal check |
+| v0.5 | Editing + office data | Resize/crop presets (SG passport 35×45 mm), ID card → A4, extra QR types, sharpen, blur area, batch rename, merge Excel/CSV, remove duplicate rows, CSV ↔ JSON |
+| v0.6 | Heavier features | Find & mask NRIC numbers, bank statement → Excel, background removal (opt-in model download), PDF → images, sign PDF |
 | v1.0 | Polish + trust | Word/Excel → PDF (uses installed Word/LibreOffice), batch mode, shortcuts, accessibility pass, code-signing decision |
 
 ## Later (pick by demand)
