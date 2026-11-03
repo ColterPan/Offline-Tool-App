@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QWidget
 
 
 def set_style_property(widget: QWidget, name: str, value: str | bool) -> None:
-    """Set a dynamic property and re-apply the stylesheet so selectors like [state="error"] update."""
+    """Set a property and re-polish, so QSS selectors like [state="error"] take effect."""
     widget.setProperty(name, value)
     style = widget.style()
     style.unpolish(widget)

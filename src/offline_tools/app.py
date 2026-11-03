@@ -4,7 +4,7 @@ import logging
 import sys
 from types import TracebackType
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMessageBox
 
@@ -22,6 +22,8 @@ from offline_tools.ui.worker import UNEXPECTED_ERROR_MESSAGE, TaskRunner
 logger = logging.getLogger(__name__)
 
 SHUTDOWN_WAIT_MS = 3000
+SMOKE_TEST_FLAG = "--smoke-test"
+SMOKE_TEST_QUIT_MS = 500
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -29,16 +31,23 @@ def main(argv: list[str] | None = None) -> int:
     log_file = configure_logging(log_dir)
     logger.info("Starting %s %s (log file: %s)", APP_NAME, __version__, log_file)
 
-    app = QApplication(argv if argv is not None else sys.argv)
+    args = argv if argv is not None else sys.argv
+    app = QApplication(args)
     app.setApplicationName(APP_NAME)
     app.setOrganizationName(APP_ID)
     app.setApplicationVersion(__version__)
     app.setWindowIcon(QIcon(str(asset_path("icon.png"))))
     _install_excepthook()
 
-    context = AppContext(settings=AppSettings(default_store()), runner=TaskRunner(), log_dir=log_dir)
+    context = AppContext(
+        settings=AppSettings(default_store()), runner=TaskRunner(), log_dir=log_dir
+    )
     window = create_main_window(app, context)
     window.show()
+    if SMOKE_TEST_FLAG in args:
+        # Used by CI to prove the packaged app starts: open the window, then quit.
+        logger.info("Smoke test: quitting after start-up")
+        QTimer.singleShot(SMOKE_TEST_QUIT_MS, app.quit)
 
     exit_code = app.exec()
     context.runner.wait_for_done(SHUTDOWN_WAIT_MS)
@@ -66,9 +75,7 @@ def _install_excepthook() -> None:
     """Log crashes in Qt callbacks and tell the user, instead of failing silently."""
     showing_dialog = False
 
-    def hook(
-        exc_type: type[BaseException], exc: BaseException, tb: TracebackType | None
-    ) -> None:
+    def hook(exc_type: type[BaseException], exc: BaseException, tb: TracebackType | None) -> None:
         nonlocal showing_dialog
         logger.critical("Unhandled exception", exc_info=(exc_type, exc, tb))
         if showing_dialog or QApplication.instance() is None:

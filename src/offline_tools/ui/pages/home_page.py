@@ -54,6 +54,9 @@ class _Section:
         self.grid = QGridLayout(self.container)
         self.grid.setContentsMargins(0, 0, 0, 0)
         self.grid.setSpacing(12)
+        for column in range(COLUMNS):
+            # Equal columns, so a section with one tool doesn't stretch it to full width.
+            self.grid.setColumnStretch(column, 1)
         self.cards = [ToolCard(tool) for tool in tools]
 
     def show_matching(self, query: str) -> int:
@@ -91,7 +94,9 @@ class HomePage(ToolPage):
         ]
         for section in self._sections:
             for card in section.cards:
-                card.clicked.connect(lambda _=False, tid=card.tool.id: self.tool_requested.emit(tid))
+                card.clicked.connect(
+                    lambda _=False, tid=card.tool.id: self.tool_requested.emit(tid)
+                )
             self.add_content(section.header)
             self.add_content(section.container)
 
@@ -112,5 +117,8 @@ class HomePage(ToolPage):
 
     def visible_tool_ids(self) -> list[str]:
         return [
-            card.tool.id for section in self._sections for card in section.cards if not card.isHidden()
+            card.tool.id
+            for section in self._sections
+            for card in section.cards
+            if not card.isHidden()
         ]

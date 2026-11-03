@@ -71,7 +71,7 @@ class AppSettings:
     def _read_enum[E: StrEnum](self, key: str, enum_type: type[E], default: E) -> E:
         raw = self._store.value(key, default.value)
         try:
-            return enum_type(raw)
+            return enum_type(str(raw))
         except ValueError:
             logger.warning("Ignoring invalid setting %s=%r", key, raw)
             return default

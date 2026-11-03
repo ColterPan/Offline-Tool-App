@@ -1,5 +1,6 @@
 """Settings: theme, where results are saved, and the log folder."""
 
+import logging
 from pathlib import Path
 
 from PySide6.QtCore import QUrl, Signal
@@ -19,6 +20,8 @@ from offline_tools.settings import OutputMode, ThemeMode
 from offline_tools.ui.context import AppContext
 from offline_tools.ui.widgets.card import Card
 from offline_tools.ui.widgets.tool_page import ToolPage
+
+logger = logging.getLogger(__name__)
 
 THEME_LABELS = {
     ThemeMode.SYSTEM: "Match system",
@@ -93,15 +96,22 @@ class SettingsPage(ToolPage):
         return card
 
     def _on_theme_selected(self, index: int) -> None:
-        mode = self.theme_combo.itemData(index)
-        if isinstance(mode, ThemeMode):
-            self.theme_changed.emit(mode)
+        # Qt stores the enum as a plain string, so convert it back.
+        raw = self.theme_combo.itemData(index)
+        try:
+            mode = ThemeMode(raw)
+        except ValueError:
+            logger.warning("Unknown theme option %r", raw)
+            return
+        self.theme_changed.emit(mode)
 
     def _on_output_mode_toggled(self, folder_mode: bool) -> None:
         if folder_mode and self._settings.output_folder is None and not self._choose_folder():
             self.next_to_input_radio.setChecked(True)
             return
-        self._settings.set_output_mode(OutputMode.FOLDER if folder_mode else OutputMode.NEXT_TO_INPUT)
+        self._settings.set_output_mode(
+            OutputMode.FOLDER if folder_mode else OutputMode.NEXT_TO_INPUT
+        )
 
     def _choose_folder(self) -> bool:
         chosen = QFileDialog.getExistingDirectory(self, "Choose where to save results")
