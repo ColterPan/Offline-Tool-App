@@ -2,7 +2,7 @@
 
 All notable changes are listed here. Versions follow [Semantic Versioning](https://semver.org/).
 
-## [0.2.0] - unreleased
+## [0.2.0] - 2026-11-03
 
 ### Added
 
@@ -24,7 +24,7 @@ All notable changes are listed here. Versions follow [Semantic Versioning](https
 
 ### Changed
 
-- Installer grows to about 57 MB (OpenCV for the scanner). Unused FFmpeg and software-OpenGL
+- Installer grows to about 53 MB (OpenCV for the scanner). Unused FFmpeg and software-OpenGL
   DLLs are left out on Windows.
 - Checked radio buttons show a proper dot; new amber "warning" colour that meets WCAG contrast.
 

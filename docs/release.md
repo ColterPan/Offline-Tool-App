@@ -33,7 +33,6 @@ bash packaging/macos/build_dmg.sh   # on a Mac, from an activated venv
 2. Commit: `chore: release v0.1.0`.
 3. Tag and push: `git tag v0.1.0 && git push origin main --tags`.
 4. GitHub Actions builds, smoke-tests and publishes the release with `SHA256SUMS.txt`.
-   v0.x releases are marked *pre-release*.
 5. Upload both files to [VirusTotal](https://www.virustotal.com) before announcing.
    If an antivirus flags it, submit it as a false positive to that vendor.
 6. Test the installer on a different PC from the one you built on.
@@ -47,9 +46,8 @@ https://github.com/ColterPan/Offline-Tool-App/releases/latest/download/OfflineTo
 https://github.com/ColterPan/Offline-Tool-App/releases/latest/download/OfflineTools.dmg
 ```
 
-Note: `/releases/latest` skips pre-releases. While on v0.x, link to the
-[releases page](https://github.com/ColterPan/Offline-Tool-App/releases) or mark a release as
-"latest" manually on GitHub.
+`/releases/latest` skips pre-releases, so the release workflow publishes every tag as a normal
+release marked *latest* (the app still calls itself beta while on v0.x).
 
 ## Code signing (later)
 
