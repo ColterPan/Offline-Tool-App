@@ -18,7 +18,7 @@ def hash_file(
     algorithm: str = "sha256",
     on_progress: ProgressCallback | None = None,
 ) -> str:
-    """Return the lowercase hex digest of a file, read in chunks so large files use little memory."""
+    """Return the file's lowercase hex digest. Reads in chunks so big files use little memory."""
     if algorithm not in ALGORITHMS:
         raise InvalidInputError(
             f'"{algorithm}" is not supported. Choose one of: {", ".join(ALGORITHMS)}.'

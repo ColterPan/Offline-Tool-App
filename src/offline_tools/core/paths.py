@@ -8,7 +8,7 @@ MAX_NAME_ATTEMPTS = 1000
 
 
 def require_file(path: Path) -> Path:
-    """Return the resolved path, or raise InvalidInputError if it is not a readable, non-empty file."""
+    """Return the resolved path, or raise InvalidInputError unless it is a non-empty file."""
     resolved = path.expanduser().resolve()
     if not resolved.exists():
         raise InvalidInputError(f'"{path.name}" could not be found.', f"missing: {resolved}")
