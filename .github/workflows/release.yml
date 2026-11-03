@@ -37,7 +37,7 @@ jobs:
           }
       - name: Build installer
         run: ./packaging/windows/build_windows.ps1 -BuildRoot $env:BUILD_ROOT
-      - name: Smoke test (install silently, launch, quit)
+      - name: Install silently, then smoke test and self-test
         env:
           QT_QPA_PLATFORM: offscreen
         run: |
@@ -47,6 +47,11 @@ jobs:
           if (-not $exe) { throw "Installed exe not found" }
           $proc = Start-Process $exe.FullName -ArgumentList "--smoke-test" -Wait -PassThru
           if ($proc.ExitCode -ne 0) { throw "Smoke test failed with exit code $($proc.ExitCode)" }
+          # Self-test: actually uses PDFium, OpenCV, zxing and Qt's SVG plugin in the installed app.
+          $env:OFFLINE_TOOLS_LOG_DIR = Join-Path $env:RUNNER_TEMP "selftest-logs"
+          $proc = Start-Process $exe.FullName -ArgumentList "--self-test" -Wait -PassThru
+          Get-Content (Join-Path $env:OFFLINE_TOOLS_LOG_DIR "offline-tools.log")
+          if ($proc.ExitCode -ne 0) { throw "Self-test failed with exit code $($proc.ExitCode)" }
       - uses: actions/upload-artifact@v4
         with:
           name: windows-installer
@@ -67,10 +72,14 @@ jobs:
         run: python -m pip install ".[dev]"
       - name: Build disk image
         run: bash packaging/macos/build_dmg.sh
-      - name: Smoke test (launch the bundled app, quit)
+      - name: Smoke test and self-test the bundled app
         env:
           QT_QPA_PLATFORM: offscreen
-        run: '"$BUILD_ROOT/dist/Offline Tools.app/Contents/MacOS/OfflineTools" --smoke-test'
+        run: |
+          APP="$BUILD_ROOT/dist/Offline Tools.app/Contents/MacOS/OfflineTools"
+          "$APP" --smoke-test
+          OFFLINE_TOOLS_LOG_DIR="$RUNNER_TEMP/selftest-logs" "$APP" --self-test || {
+            cat "$RUNNER_TEMP/selftest-logs/offline-tools.log"; exit 1; }
       - uses: actions/upload-artifact@v4
         with:
           name: macos-dmg

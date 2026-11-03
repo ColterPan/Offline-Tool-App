@@ -70,6 +70,13 @@ a = Analysis(
     datas=[(str(ASSETS), "offline_tools/assets")],
     excludes=EXCLUDES,
 )
+if sys.platform == "win32":
+    # OpenCV's FFmpeg DLL (~25 MB) is only for video files/streams. The webcam uses Windows'
+    # own camera API (DirectShow), so drop it. On macOS FFmpeg is linked into cv2 itself.
+    # opengl32sw.dll (~20 MB) is Qt's software OpenGL fallback; this app draws no OpenGL.
+    unused = ("opencv_videoio_ffmpeg", "opengl32sw.dll")
+    a.binaries = [b for b in a.binaries if not any(name in b[0].lower() for name in unused)]
+
 pyz = PYZ(a.pure)
 
 exe = EXE(
@@ -98,5 +105,10 @@ if sys.platform == "darwin":
             "CFBundleVersion": meta.__version__,
             "NSHighResolutionCapable": True,
             "LSMinimumSystemVersion": "12.0",
+            # Required: without it macOS terminates the app when it asks for the webcam.
+            "NSCameraUsageDescription": (
+                f"{meta.APP_NAME} uses the camera only to read QR codes. "
+                "Video never leaves this computer."
+            ),
         },
     )

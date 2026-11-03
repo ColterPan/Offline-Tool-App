@@ -2,6 +2,8 @@
 
 import logging
 import sys
+import tempfile
+from pathlib import Path
 from types import TracebackType
 
 from PySide6.QtCore import Qt, QTimer
@@ -12,6 +14,7 @@ from offline_tools import APP_ID, APP_NAME, __version__
 from offline_tools.logging_setup import configure_logging, default_log_dir
 from offline_tools.registry import ToolRegistry
 from offline_tools.resources import asset_path
+from offline_tools.selftest import run_self_test
 from offline_tools.settings import AppSettings, ThemeMode, default_store
 from offline_tools.ui.context import AppContext
 from offline_tools.ui.main_window import MainWindow
@@ -23,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 SHUTDOWN_WAIT_MS = 3000
 SMOKE_TEST_FLAG = "--smoke-test"
+SELF_TEST_FLAG = "--self-test"
 SMOKE_TEST_QUIT_MS = 500
 
 
@@ -32,6 +36,8 @@ def main(argv: list[str] | None = None) -> int:
     logger.info("Starting %s %s (log file: %s)", APP_NAME, __version__, log_file)
 
     args = argv if argv is not None else sys.argv
+    if SELF_TEST_FLAG in args:
+        return _self_test()
     app = QApplication(args)
     app.setApplicationName(APP_NAME)
     app.setOrganizationName(APP_ID)
@@ -53,6 +59,15 @@ def main(argv: list[str] | None = None) -> int:
     context.runner.wait_for_done(SHUTDOWN_WAIT_MS)
     logger.info("Exiting with code %s", exit_code)
     return exit_code
+
+
+def _self_test() -> int:
+    with tempfile.TemporaryDirectory(prefix=f"{APP_ID}-selftest-") as work:
+        failures = run_self_test(Path(work))
+    for failure in failures:
+        logger.error("Self-test failure: %s", failure)
+    logger.info("Self-test finished: %d failure(s)", len(failures))
+    return 1 if failures else 0
 
 
 def create_main_window(app: QApplication, context: AppContext) -> MainWindow:
