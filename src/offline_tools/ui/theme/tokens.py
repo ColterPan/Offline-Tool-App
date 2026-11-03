@@ -11,7 +11,8 @@ class Palette:
     surface: str
     surface_alt: str
     sidebar: str
-    border: str
+    border: str  # decorative: card outlines, dividers
+    control_border: str  # inputs, checkboxes: at least 3:1 against surface (WCAG 1.4.11)
     text: str
     text_muted: str
     accent: str
@@ -32,13 +33,14 @@ LIGHT = Palette(
     surface_alt="#EEF1F5",
     sidebar="#ECEFF3",
     border="#D9DEE5",
+    control_border="#7D8796",
     text="#1B1F24",
     text_muted="#5B6573",
     accent="#2563EB",
     accent_hover="#1D4ED8",
     accent_text="#FFFFFF",
     selection="#DBE6FD",
-    success="#15803D",
+    success="#166534",
     success_bg="#E7F6EC",
     danger="#B91C1C",
     danger_bg="#FDECEC",
@@ -52,6 +54,7 @@ DARK = Palette(
     surface_alt="#272B31",
     sidebar="#1B1D21",
     border="#353A42",
+    control_border="#7A8491",
     text="#E6E8EB",
     text_muted="#9AA3AE",
     accent="#60A5FA",

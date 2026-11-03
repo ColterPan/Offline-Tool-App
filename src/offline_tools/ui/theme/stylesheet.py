@@ -1,5 +1,6 @@
 """Qt stylesheet (QSS) built from the design tokens."""
 
+from offline_tools.resources import asset_path
 from offline_tools.ui.theme.tokens import (
     FONT_SIZE_PT,
     RADIUS,
@@ -11,6 +12,9 @@ from offline_tools.ui.theme.tokens import (
 
 
 def build_stylesheet(p: Palette) -> str:
+    # QSS url() needs forward slashes, even on Windows.
+    check_icon = asset_path(f"check-{p.name}.svg").as_posix()
+    chevron_icon = asset_path(f"chevron-{p.name}.svg").as_posix()
     return f"""
 * {{ font-size: {FONT_SIZE_PT}pt; }}
 QMainWindow, QWidget#PageRoot {{ background: {p.window}; color: {p.text}; }}
@@ -51,15 +55,25 @@ QPushButton#ToolCard {{
 QPushButton#ToolCard:hover {{ border: 1px solid {p.accent}; background: {p.surface}; }}
 QPushButton#ToolCard:focus {{ border: 2px solid {p.accent}; }}
 
-QLineEdit, QComboBox, QPlainTextEdit {{
-    background: {p.surface}; color: {p.text}; border: 1px solid {p.border};
+QLineEdit, QComboBox, QPlainTextEdit, QListWidget {{
+    background: {p.surface}; color: {p.text}; border: 1px solid {p.control_border};
     border-radius: {RADIUS_SMALL}px; padding: 6px 8px;
     selection-background-color: {p.accent}; selection-color: {p.accent_text};
 }}
-QLineEdit:focus, QComboBox:focus, QPlainTextEdit:focus {{ border: 2px solid {p.accent}; }}
+QLineEdit:focus, QComboBox:focus, QPlainTextEdit:focus, QListWidget:focus {{
+    border: 2px solid {p.accent};
+}}
 QLineEdit[readOnly="true"] {{ background: {p.surface_alt}; }}
+QLineEdit:disabled, QComboBox:disabled, QListWidget:disabled {{ color: {p.text_muted}; }}
+QListWidget {{ padding: 4px; }}
+QListWidget::item {{ padding: 5px 6px; border-radius: 4px; }}
+QListWidget::item:selected {{ background: {p.selection}; color: {p.text}; }}
+QComboBox {{ padding-right: 28px; }}
+QComboBox::drop-down {{ border: none; width: 26px; subcontrol-position: center right; }}
+QComboBox::down-arrow {{ image: url("{chevron_icon}"); width: 12px; height: 12px; }}
 QComboBox QAbstractItemView {{
-    background: {p.surface}; color: {p.text}; selection-background-color: {p.selection};
+    background: {p.surface}; color: {p.text}; border: 1px solid {p.control_border};
+    selection-background-color: {p.selection}; selection-color: {p.text}; outline: 0;
 }}
 
 QFrame#Card {{ background: {p.surface}; border: 1px solid {p.border}; border-radius: {RADIUS}px; }}
@@ -83,5 +97,26 @@ QProgressBar {{
 QProgressBar::chunk {{ background: {p.accent}; border-radius: 4px; }}
 
 QRadioButton, QCheckBox {{ color: {p.text}; background: transparent; spacing: 8px; }}
+QCheckBox::indicator, QRadioButton::indicator {{
+    width: 16px; height: 16px; background: {p.surface}; border: 1px solid {p.control_border};
+}}
+QCheckBox::indicator {{ border-radius: 4px; }}
+QRadioButton::indicator {{ border-radius: 9px; }}
+QCheckBox::indicator:hover, QRadioButton::indicator:hover {{ border-color: {p.accent}; }}
+QCheckBox::indicator:focus, QRadioButton::indicator:focus {{ border: 2px solid {p.accent}; }}
+QCheckBox::indicator:checked {{
+    background: {p.accent}; border-color: {p.accent}; image: url("{check_icon}");
+}}
+QRadioButton::indicator:checked {{ border: 5px solid {p.accent}; background: {p.surface}; }}
+QCheckBox:focus, QRadioButton:focus {{ color: {p.accent}; }}
+
+QSlider::groove:horizontal {{ height: 6px; background: {p.surface_alt}; border-radius: 3px; }}
+QSlider::sub-page:horizontal {{ background: {p.accent}; border-radius: 3px; }}
+QSlider::handle:horizontal {{
+    width: 18px; height: 18px; margin: -7px 0; border-radius: 9px;
+    background: {p.surface}; border: 2px solid {p.accent};
+}}
+QSlider::handle:horizontal:disabled {{ border-color: {p.control_border}; }}
+QSlider::sub-page:horizontal:disabled {{ background: {p.control_border}; }}
 QToolTip {{ background: {p.surface}; color: {p.text}; border: 1px solid {p.border}; }}
 """
