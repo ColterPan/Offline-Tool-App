@@ -15,19 +15,23 @@ def make_qr(data: str, *, box_size: int = 10) -> PIL.Image.Image:
 
 - Take plain values/paths, return a result or write via `unique_output_path(...)`.
 - Raise `InvalidInputError` / `OutputError` with a message a non-technical user understands.
-- Accept an optional `on_progress(done, total)` callback for slow work.
+- Accept a keyword argument `on_progress: ProgressCallback | None = None` and call
+  `report(on_progress, done, total)` (from `core/progress.py`). The background worker always
+  calls jobs as `job(on_progress=...)`, so `partial(your_function, args...)` just works.
 - No Qt imports.
 
 ## 2. Page (`src/offline_tools/ui/tools/qr_page.py`)
 
 Subclass `ToolPage`, add widgets with `self.add_content(...)`, and run the core function through
-the runner so the UI never freezes:
+`run_task`, which runs it in the background, shows a progress bar and puts any error in the
+result banner:
 
 ```python
-self._runner.submit(
-    partial(make_qr, text),
-    on_success=self._on_done,
-    on_error=lambda message, _detail: self.banner.show_error(message),
+self.run_task(
+    self._context.runner,
+    partial(convert_images, sources, target, out_dir_for=settings.output_dir_for),
+    self._on_done,                      # receives the function's return value
+    disable=[self.drop_zone, self.convert_button],  # greyed out while it runs
 )
 ```
 
@@ -69,3 +73,13 @@ dependency, run the local build (see `docs/release.md`) and try the tool in the 
 ```text
 feat: add QR code generator
 ```
+
+## Reusable widgets
+
+| Widget | Use it for |
+|---|---|
+| `DropZone` | Drag-and-drop + Browse button, filtered by extension |
+| `FileList` | Ordered list of chosen files with Move up/down, Remove, Clear |
+| `Card` | Grouping related options |
+| `forms.combo` / `forms.form` | (label, value) dropdowns and labelled option rows |
+| `ResultBanner` (`self.banner`) | Success with "Open folder", or an error message |

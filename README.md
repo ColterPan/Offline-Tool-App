@@ -3,8 +3,8 @@
 Everyday file tools (PDF, images, data, QR codes) that run **entirely on your own computer**.
 No uploads, no accounts, no tracking. Your NRIC, payslips and certificates never leave your PC.
 
-> Status: **early beta (v0.0.1)**. The app shell, theme, installer pipeline and the first tool
-> (Check File Hash) are done. See the [roadmap](docs/roadmap.md) for what's next.
+> Status: **beta (v0.1.0)**. Five tools work today; see the [roadmap](docs/roadmap.md) for
+> what's next. The repository is private until the first public release.
 
 ## Why
 
@@ -16,38 +16,39 @@ desktop app you open from your Start menu or Applications folder.
 
 Download the latest release from the [Releases page](https://github.com/ColterPan/Offline-Tool-App/releases/latest).
 
-| OS                                                           | File                                                                                                                       | First launch                                                                                                                                                                  |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Windows 10/11 (64-bit)                                       | `# Windows. Keep the virtual environment OUTSIDE OneDrive/Dropbox folders.                                                 |                                                                                                                                                                               |
-| python -m venv $env:LOCALAPPDATA\offline-tools\.venv         |                                                                                                                            |                                                                                                                                                                               |
-| & $env:LOCALAPPDATA\offline-tools\.venv\Scripts\Activate.ps1 |                                                                                                                            |                                                                                                                                                                               |
-| pip install -e ".[dev]"                                      |                                                                                                                            |                                                                                                                                                                               |
-| python -m offline_tool`                                      | The beta isn't code-signed yet, so Windows shows *"Windows protected your PC"*. Click **More info → Run anyway**. |                                                                                                                                                                               |
-| macOS 14+ (Apple Silicon)                                    | `OfflineTools.dmg`                                                                                                       | Drag to Applications and open it. macOS will block it once. Then go to **System Settings → Privacy & Security**, scroll down, click **Open Anyway** and confirm. |
+| OS | File | First launch |
+|---|---|---|
+| Windows 10/11 (64-bit) | `OfflineTools-Setup.exe` | The beta isn't code-signed yet, so Windows shows *"Windows protected your PC"*. Click **More info → Run anyway**. |
+| macOS 14+ (Apple Silicon) | `OfflineTools.dmg` | Drag to Applications and open it. macOS will block it once. Then go to **System Settings → Privacy & Security**, scroll down, click **Open Anyway** and confirm. |
 
 Each release lists SHA-256 checksums. You can check your download with the app's own
 *Check File Hash* tool, or in PowerShell: `Get-FileHash .\OfflineTools-Setup.exe`.
 
 ## Tools
 
-| Category     | Tool                                                      | Status       |
-| ------------ | --------------------------------------------------------- | ------------ |
-| Everyday     | Check File Hash (SHA-256 / SHA-1 / MD5)                   | ✅ v0.0.1    |
-| Everyday     | QR code generator (link, Wi-Fi, contact)                  | Planned v0.1 |
-| PDF          | Images → PDF                                             | Planned v0.1 |
-| Data         | Excel ↔ CSV                                              | Planned v0.1 |
-| PDF / Images | Compress, merge/split, HEIC → JPG, remove photo location | Planned v0.2 |
+| Category | Tool | Status |
+|---|---|---|
+| PDF | Images → PDF (reorder pages, A4/Letter, margins) | ✅ v0.1 |
+| Images | Convert Images: JPG ↔ PNG ↔ WEBP, batch, strips location data | ✅ v0.1 |
+| Data | Excel ↔ CSV (keeps leading zeros, blocks formula injection) | ✅ v0.1 |
+| Everyday | QR Code Generator: link/text, Wi-Fi login, contact card | ✅ v0.1 |
+| Everyday | Check File Hash (SHA-256 / SHA-1 / MD5) | ✅ v0.0.1 |
+| PDF / Images | Compress PDF and images, merge/split PDF, HEIC → JPG, remove photo location | Planned v0.2 |
 
 ## Run from source
 
 Requires Python 3.12+.
 
+**Windows: double-click `run.bat`.** The first run creates a Python environment in
+`%LOCALAPPDATA%\offline-tools\.venv` (outside OneDrive) and installs everything. Later runs
+start straight away, and reinstall automatically when `pyproject.toml` changes.
+
+Or from a terminal:
+
 ```powershell
-# Windows. Keep the virtual environment OUTSIDE OneDrive/Dropbox folders.
-python -m venv $env:LOCALAPPDATA\offline-tools\.venv
-& $env:LOCALAPPDATA\offline-tools\.venv\Scripts\Activate.ps1
-pip install -e ".[dev]"
-python -m offline_tools
+.\run.bat
+# or, once set up:
+& $env:LOCALAPPDATA\offline-tools\.venv\Scripts\python.exe -m offline_tools
 ```
 
 ```bash
@@ -59,7 +60,8 @@ python -m offline_tools
 
 ## Development
 
-```bash
+```powershell
+& $env:LOCALAPPDATA\offline-tools\.venv\Scripts\Activate.ps1   # once per terminal
 ruff check . && ruff format --check .   # lint + formatting
 mypy src tests                          # strict type checking
 pytest --cov=offline_tools              # tests (Qt runs headless)
