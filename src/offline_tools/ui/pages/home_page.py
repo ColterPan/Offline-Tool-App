@@ -17,7 +17,7 @@ from offline_tools.ui.widgets.tool_page import ToolPage
 COLUMNS = 3
 CARD_MIN_WIDTH = 200
 CARD_MIN_HEIGHT = 108
-UPCOMING_TOOLS = "PDF compress & merge, image convert, HEIC → JPG, Excel ↔ CSV, QR codes"
+UPCOMING_TOOLS = "compress PDF and images, merge/split PDF, HEIC → JPG, remove photo location data"
 
 
 class ToolCard(QPushButton):

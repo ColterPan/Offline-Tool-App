@@ -1,16 +1,14 @@
 """File checksums, used to confirm a download has not been tampered with."""
 
 import hashlib
-from collections.abc import Callable
 from pathlib import Path
 
 from offline_tools.core.errors import InvalidInputError
 from offline_tools.core.paths import require_file
+from offline_tools.core.progress import ProgressCallback, report
 
 ALGORITHMS = ("sha256", "sha1", "md5")
 CHUNK_SIZE = 1024 * 1024
-
-ProgressCallback = Callable[[int, int], None]
 
 
 def hash_file(
@@ -34,8 +32,7 @@ def hash_file(
             while chunk := handle.read(CHUNK_SIZE):
                 digest.update(chunk)
                 done += len(chunk)
-                if on_progress is not None:
-                    on_progress(done, total)
+                report(on_progress, done, total)
     except OSError as exc:
         raise InvalidInputError(f'"{source.name}" could not be read.', repr(exc)) from exc
 

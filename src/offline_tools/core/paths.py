@@ -30,9 +30,7 @@ def unique_output_path(
 
     If the name is taken, ' 2', ' 3', ... is appended inside the brackets.
     """
-    if new_suffix is not None and not new_suffix.startswith("."):
-        raise ValueError(f"new_suffix must start with '.', got {new_suffix!r}")
-
+    _check_suffix(new_suffix)
     folder = out_dir if out_dir is not None else source.parent
     suffix = new_suffix if new_suffix is not None else source.suffix
 
@@ -45,6 +43,32 @@ def unique_output_path(
         f'Could not find a free file name for "{source.name}". Try a different output folder.',
         f"{MAX_NAME_ATTEMPTS} names taken in {folder}",
     )
+
+
+def preferred_output_path(
+    source: Path,
+    *,
+    out_dir: Path | None = None,
+    new_suffix: str | None = None,
+    label: str = "converted",
+) -> Path:
+    """Use the plain name ('photo.jpg') when it is free, otherwise fall back to a labelled one."""
+    _check_suffix(new_suffix)
+    folder = out_dir if out_dir is not None else source.parent
+    plain = folder / f"{source.stem}{new_suffix if new_suffix is not None else source.suffix}"
+    if not plain.exists() and plain != source:
+        return plain
+    return unique_output_path(source, out_dir=out_dir, new_suffix=new_suffix, label=label)
+
+
+def part_path(final: Path) -> Path:
+    """Temporary name used while writing, so a crash never leaves a half-written result."""
+    return final.with_name(f"{final.name}.part")
+
+
+def _check_suffix(new_suffix: str | None) -> None:
+    if new_suffix is not None and not new_suffix.startswith("."):
+        raise ValueError(f"new_suffix must start with '.', got {new_suffix!r}")
 
 
 def _bracket(label: str, attempt: int) -> str:

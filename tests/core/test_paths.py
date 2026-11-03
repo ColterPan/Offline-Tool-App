@@ -3,7 +3,12 @@ from pathlib import Path
 import pytest
 
 from offline_tools.core.errors import InvalidInputError
-from offline_tools.core.paths import require_file, unique_output_path
+from offline_tools.core.paths import (
+    part_path,
+    preferred_output_path,
+    require_file,
+    unique_output_path,
+)
 
 
 def test_require_file_returns_resolved_path(tmp_path: Path) -> None:
@@ -62,6 +67,30 @@ def test_unique_output_path_never_returns_the_source_itself(tmp_path: Path) -> N
 
     assert result != source
     assert not result.exists()
+
+
+def test_preferred_output_path_uses_plain_name_when_free(tmp_path: Path) -> None:
+    source = tmp_path / "photo.png"
+
+    assert preferred_output_path(source, new_suffix=".jpg") == tmp_path / "photo.jpg"
+
+
+def test_preferred_output_path_falls_back_to_label(tmp_path: Path) -> None:
+    source = tmp_path / "photo.png"
+    (tmp_path / "photo.jpg").touch()
+
+    assert preferred_output_path(source, new_suffix=".jpg") == tmp_path / "photo (converted).jpg"
+
+
+def test_preferred_output_path_never_returns_source(tmp_path: Path) -> None:
+    source = tmp_path / "photo.png"
+    source.touch()
+
+    assert preferred_output_path(source) == tmp_path / "photo (converted).png"
+
+
+def test_part_path_appends_part_suffix(tmp_path: Path) -> None:
+    assert part_path(tmp_path / "a.pdf") == tmp_path / "a.pdf.part"
 
 
 def test_unique_output_path_rejects_suffix_without_dot(tmp_path: Path) -> None:
