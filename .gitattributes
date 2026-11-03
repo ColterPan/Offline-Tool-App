@@ -3,3 +3,5 @@
 *.sh text eol=lf
 *.png binary
 *.ico binary
+*.bat text eol=crlf
+*.svg text eol=lf
