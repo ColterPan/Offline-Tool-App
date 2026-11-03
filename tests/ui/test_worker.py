@@ -21,9 +21,9 @@ def _collect(qtbot: QtBot, runner: TaskRunner, job: object) -> dict[str, object]
 
 
 def test_success_delivers_result_and_progress(qtbot: QtBot) -> None:
-    def job(progress: ProgressFn) -> int:
-        progress(1, 2)
-        progress(2, 2)
+    def job(*, on_progress: ProgressFn) -> int:
+        on_progress(1, 2)
+        on_progress(2, 2)
         return 42
 
     results = _collect(qtbot, TaskRunner(), job)
@@ -33,7 +33,7 @@ def test_success_delivers_result_and_progress(qtbot: QtBot) -> None:
 
 
 def test_tool_error_is_reported_with_user_message(qtbot: QtBot) -> None:
-    def job(_progress: ProgressFn) -> None:
+    def job(*, on_progress: ProgressFn) -> None:
         raise ToolError("That file is not a PDF.", "bad header")
 
     results = _collect(qtbot, TaskRunner(), job)
@@ -47,7 +47,7 @@ def test_tool_error_is_reported_with_user_message(qtbot: QtBot) -> None:
 )
 def test_task_run_emits_matching_signal(qtbot: QtBot, job_result: object, signal_name: str) -> None:
     # Runs on the main thread so coverage can trace the body of _Task.run.
-    def job(_progress: ProgressFn) -> object:
+    def job(*, on_progress: ProgressFn) -> object:
         if isinstance(job_result, Exception):
             raise job_result
         return job_result
@@ -59,7 +59,7 @@ def test_task_run_emits_matching_signal(qtbot: QtBot, job_result: object, signal
 
 
 def test_unexpected_error_gets_generic_message(qtbot: QtBot) -> None:
-    def job(_progress: ProgressFn) -> None:
+    def job(*, on_progress: ProgressFn) -> None:
         raise RuntimeError("boom")
 
     results = _collect(qtbot, TaskRunner(), job)

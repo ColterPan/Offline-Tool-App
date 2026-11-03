@@ -15,7 +15,9 @@ UNEXPECTED_ERROR_MESSAGE = (
 )
 
 type ProgressFn = Callable[[int, int], None]
-type Job = Callable[[ProgressFn], Any]
+# A job is called as job(on_progress=...). Core functions all take a keyword `on_progress`,
+# so functools.partial(core_function, args...) is a valid job.
+type Job = Callable[..., Any]
 
 
 class _TaskSignals(QObject):
@@ -34,7 +36,7 @@ class _Task(QRunnable):
 
     def run(self) -> None:
         try:
-            result = self._job(self.signals.progress.emit)
+            result = self._job(on_progress=self.signals.progress.emit)
         except ToolError as exc:
             logger.warning("Tool failed: %s", exc.detail)
             self.signals.failed.emit(exc.user_message, exc.detail)
@@ -63,7 +65,7 @@ class TaskRunner:
         on_error: Callable[[str, str], None],
         on_progress: ProgressFn | None = None,
     ) -> None:
-        """Run `job(progress)` in the pool. Callbacks run on the UI thread."""
+        """Run `job(on_progress=...)` in the pool. Callbacks run on the UI thread."""
         task = _Task(job)
         self._active.add(task)
         if on_progress is not None:

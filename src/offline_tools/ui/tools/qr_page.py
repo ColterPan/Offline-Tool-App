@@ -238,7 +238,7 @@ class QrPage(ToolPage):
                 Qt.TransformationMode.FastTransformation,  # keep module edges crisp
             )
             self.preview.setPixmap(pixmap)
-            self.status_label.setText(f"{self.image.width} × {self.image.height} px")
+            self.status_label.setText(f"{self.image.width} x {self.image.height} px")
         self.refresh_state()
 
     def refresh_state(self) -> None:

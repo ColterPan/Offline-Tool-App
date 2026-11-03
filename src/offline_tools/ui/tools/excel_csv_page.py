@@ -19,6 +19,7 @@ from offline_tools.ui.widgets.card import Card
 from offline_tools.ui.widgets.drop_zone import DropZone
 from offline_tools.ui.widgets.forms import combo, form
 from offline_tools.ui.widgets.tool_page import ToolPage
+from offline_tools.ui.worker import Job
 
 ENCODING_OPTIONS = (
     ("For Excel (UTF-8 with BOM, recommended)", CsvEncoding.UTF8_BOM),
@@ -94,7 +95,7 @@ class ExcelCsvPage(ToolPage):
         # Reading sheet names opens the workbook, which can be slow for big files.
         self.run_task(
             self._context.runner,
-            partial(list_sheets, path),
+            lambda on_progress: list_sheets(path),  # quick: no progress to report
             self._on_sheets,
             disable=self._busy_widgets,
         )
@@ -103,18 +104,18 @@ class ExcelCsvPage(ToolPage):
         if self._file is None or self.direction is Direction.NONE:
             return
         out_dir = self._context.settings.output_dir_for(self._file)
+        job: Job
         if self.direction is Direction.TO_EXCEL:
             job = partial(csv_to_excel, self._file, out_dir=out_dir)
-            self.run_task(self._context.runner, job, self._on_done, disable=self._busy_widgets)
-            return
-        sheet = self.sheet_combo.currentData()
-        job = partial(
-            excel_to_csv,
-            self._file,
-            sheet=str(sheet) if sheet else None,
-            out_dir=out_dir,
-            encoding=CsvEncoding(self.encoding_combo.currentData()),
-        )
+        else:
+            sheet = self.sheet_combo.currentData()
+            job = partial(
+                excel_to_csv,
+                self._file,
+                sheet=str(sheet) if sheet else None,
+                out_dir=out_dir,
+                encoding=CsvEncoding(self.encoding_combo.currentData()),
+            )
         self.run_task(self._context.runner, job, self._on_done, disable=self._busy_widgets)
 
     def refresh_state(self) -> None:
