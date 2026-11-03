@@ -18,6 +18,10 @@ dependencies = [
     "qrcode>=8,<9",
     "openpyxl>=3.1,<4",
     "defusedxml>=0.7,<1", # openpyxl uses it automatically to block malicious XML in .xlsx
+    "pypdfium2>=4.30,<6",
+    "opencv-python-headless>=4.10,<5", # headless: no bundled Qt to clash with PySide6
+    "zxing-cpp>=2.2,<4",
+    "numpy>=2,<3",
 ]
 
 [project.optional-dependencies]
@@ -75,3 +79,11 @@ python_version = "3.12"
 strict = true
 warn_unreachable = true
 mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["pypdfium2", "pypdfium2.*"] # ships without type information
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_calls = false # pytest-qt's mouse/keyboard helpers are untyped

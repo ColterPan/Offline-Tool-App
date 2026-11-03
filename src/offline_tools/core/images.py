@@ -1,7 +1,7 @@
 """Image conversion and images → PDF, using Pillow."""
 
 import logging
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -78,7 +78,7 @@ def to_rgb(img: Image.Image) -> Image.Image:
     """Drop transparency onto white (JPEG and PDF pages can't be transparent)."""
     if img.mode == "RGB":
         return img
-    if _has_alpha(img):
+    if has_alpha(img):
         rgba = img.convert("RGBA")
         background = Image.new("RGB", rgba.size, WHITE)
         background.paste(rgba, mask=rgba.getchannel("A"))
@@ -94,9 +94,30 @@ def convert_image(
     quality: int = DEFAULT_QUALITY,
 ) -> Path:
     """Save `source` as `target` in out_dir. Metadata (camera, GPS location) is not copied."""
-    img = open_image(source)
-    prepared = to_rgb(img) if target is ImageFormat.JPEG else _rgb_or_rgba(img)
     out = preferred_output_path(source, out_dir=out_dir, new_suffix=target.suffix)
+    save_image(open_image(source), out, target, quality=quality)
+    return out
+
+
+def format_for_suffix(suffix: str) -> ImageFormat:
+    """Keep JPG/PNG/WEBP as they are; anything else (BMP, GIF, TIFF) is saved as PNG."""
+    return {
+        ".jpg": ImageFormat.JPEG,
+        ".jpeg": ImageFormat.JPEG,
+        ".webp": ImageFormat.WEBP,
+    }.get(suffix.lower(), ImageFormat.PNG)
+
+
+def save_image(
+    img: Image.Image, out: Path, target: ImageFormat, *, quality: int = DEFAULT_QUALITY
+) -> Path:
+    """Write `img` atomically. Metadata (EXIF, GPS) is never written."""
+    if img.mode == "L" and target is not ImageFormat.WEBP:
+        prepared = img  # greyscale stays greyscale: a third of the size of RGB
+    elif target is ImageFormat.JPEG:
+        prepared = to_rgb(img)
+    else:
+        prepared = _rgb_or_rgba(img)
     _save_atomically(prepared, out, target.value.upper(), **_save_options(target, quality))
     return out
 
@@ -134,15 +155,32 @@ def images_to_pdf(
     margin_mm: float = 0,
     on_progress: ProgressCallback | None = None,
 ) -> Path:
-    """One page per image, in order. Pages are written one at a time to keep memory low."""
+    """One page per image, in order."""
     if not sources:
         raise InvalidInputError("Add at least one image.")
+    pages = (_pdf_page(open_image(source), page_size, margin_mm) for source in sources)
+    return write_pdf(pages, out_path, total=len(sources), on_progress=on_progress)
+
+
+def write_pdf(
+    pages: Iterable[Image.Image],
+    out_path: Path,
+    *,
+    total: int,
+    resolution: float = PDF_DPI,
+    on_progress: ProgressCallback | None = None,
+) -> Path:
+    """Write image pages to a PDF one at a time (low memory), via a .part file."""
     tmp = part_path(out_path)
+    written = 0
     try:
-        for index, source in enumerate(sources):
-            page = _pdf_page(open_image(source), page_size, margin_mm)
-            page.save(tmp, "PDF", resolution=PDF_DPI, append=index > 0)
-            report(on_progress, index + 1, len(sources))
+        for page in pages:
+            pdf_ready = page if page.mode in ("L", "RGB") else to_rgb(page)
+            pdf_ready.save(tmp, "PDF", resolution=resolution, append=written > 0)
+            written += 1
+            report(on_progress, written, total)
+        if written == 0:
+            raise InvalidInputError("There are no pages to save.")
         tmp.replace(out_path)
     except ToolError:
         tmp.unlink(missing_ok=True)
@@ -179,12 +217,12 @@ def _mm_to_px(mm: float) -> int:
     return round(mm / MM_PER_INCH * PDF_DPI)
 
 
-def _has_alpha(img: Image.Image) -> bool:
+def has_alpha(img: Image.Image) -> bool:
     return img.mode in ("RGBA", "LA", "PA") or (img.mode == "P" and "transparency" in img.info)
 
 
 def _rgb_or_rgba(img: Image.Image) -> Image.Image:
-    wanted = "RGBA" if _has_alpha(img) else "RGB"
+    wanted = "RGBA" if has_alpha(img) else "RGB"
     return img if img.mode == wanted else img.convert(wanted)
 
 
