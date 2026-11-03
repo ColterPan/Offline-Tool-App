@@ -1,0 +1,99 @@
+name: Release
+
+# Push a tag like v0.1.0 to build both installers and publish a GitHub Release.
+# Run it manually (Actions tab > Release > Run workflow) to build without publishing.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      BUILD_ROOT: ${{ runner.temp }}\build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python -m pip install ".[dev]"
+      - name: Check tag matches version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: python -c "import offline_tools as m, sys; sys.exit(0 if 'v' + m.__version__ == '${{ github.ref_name }}' else 'Tag ${{ github.ref_name }} does not match __version__ ' + m.__version__)"
+      - name: Install Inno Setup if missing
+        run: |
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue) -and -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
+      - name: Build installer
+        run: ./packaging/windows/build_windows.ps1 -BuildRoot $env:BUILD_ROOT
+      - name: Smoke test (install silently, launch, quit)
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          $setup = Join-Path $env:BUILD_ROOT "OfflineTools-Setup.exe"
+          Start-Process $setup -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/CURRENTUSER", "/NORESTART" -Wait
+          $exe = Get-ChildItem "$env:LOCALAPPDATA\Programs" -Recurse -Filter OfflineTools.exe | Select-Object -First 1
+          if (-not $exe) { throw "Installed exe not found" }
+          $proc = Start-Process $exe.FullName -ArgumentList "--smoke-test" -Wait -PassThru
+          if ($proc.ExitCode -ne 0) { throw "Smoke test failed with exit code $($proc.ExitCode)" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: ${{ env.BUILD_ROOT }}\OfflineTools-Setup.exe
+          if-no-files-found: error
+
+  macos:
+    runs-on: macos-14 # Apple Silicon (arm64). Intel Macs are not supported yet.
+    env:
+      BUILD_ROOT: ${{ runner.temp }}/build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python -m pip install ".[dev]"
+      - name: Build disk image
+        run: bash packaging/macos/build_dmg.sh
+      - name: Smoke test (launch the bundled app, quit)
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: '"$BUILD_ROOT/dist/Offline Tools.app/Contents/MacOS/OfflineTools" --smoke-test'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg
+          path: ${{ env.BUILD_ROOT }}/OfflineTools.dmg
+          if-no-files-found: error
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        run: cd dist && sha256sum OfflineTools-Setup.exe OfflineTools.dmg > SHA256SUMS.txt && cat SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/OfflineTools-Setup.exe
+            dist/OfflineTools.dmg
+            dist/SHA256SUMS.txt
+          prerelease: ${{ startsWith(github.ref_name, 'v0.') }}
+          generate_release_notes: true
