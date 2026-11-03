@@ -16,9 +16,10 @@ jobs:
     defaults:
       run:
         shell: pwsh
-    env:
-      BUILD_ROOT: ${{ runner.temp }}\build
     steps:
+      # `runner.temp` isn't available in job-level env, so set BUILD_ROOT from a step.
+      - name: Set build folder
+        run: Add-Content $env:GITHUB_ENV "BUILD_ROOT=$env:RUNNER_TEMP\build"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
@@ -54,9 +55,9 @@ jobs:
 
   macos:
     runs-on: macos-14 # Apple Silicon (arm64). Intel Macs are not supported yet.
-    env:
-      BUILD_ROOT: ${{ runner.temp }}/build
     steps:
+      - name: Set build folder
+        run: echo "BUILD_ROOT=$RUNNER_TEMP/build" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:

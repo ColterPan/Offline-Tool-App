@@ -1,9 +1,12 @@
 name: CI
 
+# Pushes test on Windows only: the repo is private, and GitHub bills macOS minutes at 10x.
+# Pull requests and manual runs (Actions > CI > Run workflow) also test on macOS.
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-14]
+        os: ${{ github.event_name == 'push' && fromJSON('["windows-latest"]') || fromJSON('["windows-latest", "macos-14"]') }}
     runs-on: ${{ matrix.os }}
     env:
       QT_QPA_PLATFORM: offscreen
