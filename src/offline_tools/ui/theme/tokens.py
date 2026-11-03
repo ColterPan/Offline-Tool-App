@@ -21,6 +21,8 @@ class Palette:
     selection: str
     success: str
     success_bg: str
+    warning: str
+    warning_bg: str
     danger: str
     danger_bg: str
 
@@ -42,6 +44,8 @@ LIGHT = Palette(
     selection="#DBE6FD",
     success="#166534",
     success_bg="#E7F6EC",
+    warning="#8A4B00",
+    warning_bg="#FFF4E0",
     danger="#B91C1C",
     danger_bg="#FDECEC",
 )
@@ -63,6 +67,8 @@ DARK = Palette(
     selection="#1E3A5F",
     success="#4ADE80",
     success_bg="#15291D",
+    warning="#FBBF24",
+    warning_bg="#33270F",
     danger="#F87171",
     danger_bg="#3A1C1C",
 )

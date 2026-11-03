@@ -90,6 +90,19 @@ QFrame#ResultBanner[state="error"] {{ background: {p.danger_bg}; border: 1px sol
 QLabel[state="success"] {{ color: {p.success}; font-weight: 600; }}
 QLabel[state="error"] {{ color: {p.danger}; font-weight: 600; }}
 
+QLabel[verdict] {{ border-radius: {RADIUS_SMALL}px; padding: 8px 12px; font-weight: 700; }}
+QLabel[verdict="ok"] {{
+    background: {p.success_bg}; color: {p.success}; border: 1px solid {p.success};
+}}
+QLabel[verdict="caution"] {{
+    background: {p.warning_bg}; color: {p.warning}; border: 1px solid {p.warning};
+}}
+QLabel[verdict="danger"] {{
+    background: {p.danger_bg}; color: {p.danger}; border: 1px solid {p.danger};
+}}
+QLabel[severity="danger"] {{ color: {p.danger}; }}
+QLabel[severity="caution"] {{ color: {p.warning}; }}
+
 QProgressBar {{
     background: {p.surface_alt}; border: none; border-radius: 4px; height: 8px; text-align: center;
     color: transparent;
@@ -107,7 +120,11 @@ QCheckBox::indicator:focus, QRadioButton::indicator:focus {{ border: 2px solid {
 QCheckBox::indicator:checked {{
     background: {p.accent}; border-color: {p.accent}; image: url("{check_icon}");
 }}
-QRadioButton::indicator:checked {{ border: 5px solid {p.accent}; background: {p.surface}; }}
+QRadioButton::indicator:checked {{
+    border: 1px solid {p.accent};
+    background: qradialgradient(cx: 0.5, cy: 0.5, radius: 0.5, fx: 0.5, fy: 0.5,
+        stop: 0 {p.accent}, stop: 0.5 {p.accent}, stop: 0.6 {p.surface}, stop: 1 {p.surface});
+}}
 QCheckBox:focus, QRadioButton:focus {{ color: {p.accent}; }}
 
 QSlider::groove:horizontal {{ height: 6px; background: {p.surface_alt}; border-radius: 3px; }}

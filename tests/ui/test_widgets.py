@@ -99,5 +99,6 @@ def test_palette_meets_wcag_contrast(palette: Palette) -> None:
     assert _contrast(palette.accent_text, palette.accent) >= 4.5
     assert _contrast(palette.success, palette.success_bg) >= 4.5
     assert _contrast(palette.danger, palette.danger_bg) >= 4.5
+    assert _contrast(palette.warning, palette.warning_bg) >= 4.5
     assert _contrast(palette.control_border, palette.surface) >= 3
     assert _contrast(palette.accent, palette.surface) >= 3

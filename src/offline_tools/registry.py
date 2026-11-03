@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 class Category(StrEnum):
     """Sidebar sections, shown in this order."""
 
+    PRIVACY = "Privacy & safety"
     PDF = "PDF"
     IMAGES = "Images"
     DATA = "Data"
