@@ -56,6 +56,7 @@ skip_covered = true
 line-length = 100
 target-version = "py312"
 src = ["src", "tests"]
+extend-exclude = ["*.md"] # keep doc snippets as written
 
 [tool.ruff.lint]
 # T20 bans print(): use logging instead.
