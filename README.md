@@ -14,7 +14,7 @@ desktop app you open from your Start menu or Applications folder.
 
 ## Install
 
-Download the latest release from the [Releases page](https://github.com/ColterPan/offline-tools/releases/latest).
+Download the latest release from the [Releases page](https://github.com/ColterPan/Offline-Tool-App/releases/latest).
 
 | OS | File | First launch |
 |---|---|---|

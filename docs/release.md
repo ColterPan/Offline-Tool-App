@@ -43,12 +43,12 @@ bash packaging/macos/build_dmg.sh   # on a Mac, from an activated venv
 Because asset names never change, these always point to the newest release:
 
 ```text
-https://github.com/ColterPan/offline-tools/releases/latest/download/OfflineTools-Setup.exe
-https://github.com/ColterPan/offline-tools/releases/latest/download/OfflineTools.dmg
+https://github.com/ColterPan/Offline-Tool-App/releases/latest/download/OfflineTools-Setup.exe
+https://github.com/ColterPan/Offline-Tool-App/releases/latest/download/OfflineTools.dmg
 ```
 
 Note: `/releases/latest` skips pre-releases. While on v0.x, link to the
-[releases page](https://github.com/ColterPan/offline-tools/releases) or mark a release as
+[releases page](https://github.com/ColterPan/Offline-Tool-App/releases) or mark a release as
 "latest" manually on GitHub.
 
 ## Code signing (later)
