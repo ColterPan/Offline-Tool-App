@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "offline-tools"
+dynamic = ["version"]
+description = "Everyday file tools (PDF, images, data, QR codes) that run entirely on your own computer."
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "Colter Pan" }]
+dependencies = [
+    "PySide6-Essentials>=6.8,<7",
+    "Pillow>=11,<13",
+    "platformdirs>=4,<5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-qt>=4.4",
+    "pytest-cov>=5",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "pyinstaller>=6.11",
+]
+
+[project.gui-scripts]
+offline-tools = "offline_tools.app:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "offline_tools.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+offline_tools = ["assets/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+qt_api = "pyside6"
+
+[tool.coverage.run]
+source = ["offline_tools"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# T20 bans print(): use logging instead.
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "N", "RUF", "T20", "PTH"]
+ignore = [
+    "N802", # Qt overrides such as dragEnterEvent are camelCase by design
+]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+mypy_path = "src"
