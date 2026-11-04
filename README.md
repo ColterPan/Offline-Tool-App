@@ -6,6 +6,17 @@ No uploads, no accounts, no tracking. Your NRIC, payslips and certificates never
 > Status: **beta (v0.2.1)**. Nine tools work today; see the [roadmap](docs/roadmap.md) for
 > what's next.
 
+## Screenshots
+
+![Home: every tool, grouped by category, all offline](docs/screenshots/offline-home.png)
+*Home: every tool, grouped by category, all offline*
+
+![Check a QR code or link: flags scam warning signs (example link)](docs/screenshots/offline-qr-check.png)
+*Check a QR code or link: flags scam warning signs (example link)*
+
+![QR code generator with live preview](docs/screenshots/offline-qr.png)
+*QR code generator with live preview*
+
 ## Why
 
 Sites like iLovePDF, Smallpdf, TinyPNG and remove.bg ask you to upload files to do simple jobs
