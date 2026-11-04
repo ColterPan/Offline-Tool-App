@@ -2,6 +2,12 @@
 
 All notable changes are listed here. Versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-11-04
+
+### Changed
+
+- New app icon: a toolbox. The macOS icon is now sharp on Retina screens (1024 px source).
+
 ## [0.2.0] - 2026-11-03
 
 ### Added

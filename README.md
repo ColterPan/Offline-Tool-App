@@ -3,7 +3,7 @@
 Everyday file tools (PDF, images, data, QR codes) that run **entirely on your own computer**.
 No uploads, no accounts, no tracking. Your NRIC, payslips and certificates never leave your PC.
 
-> Status: **beta (v0.2.0)**. Nine tools work today; see the [roadmap](docs/roadmap.md) for
+> Status: **beta (v0.2.1)**. Nine tools work today; see the [roadmap](docs/roadmap.md) for
 > what's next.
 
 ## Why
